@@ -82,6 +82,43 @@ std::vector<std::vector<int>> euclideanCluster(const std::vector<std::vector<flo
 
 	std::vector<std::vector<int>> clusters;
  
+	std::vector<bool> processed(points.size(), false);
+
+	int i = 0;
+	while(i <points.size()){
+		if(processed[i]){
+			i++;
+			continue; 
+		}
+
+		std::vector<int> cluster; 
+		clusterHelper(i, points, cluster, processed, tree, distanceTol);
+		clusters.push_back(cluster);
+		i++; 
+	}
+
+
+void clusterHelper(int indice, const std::vector<std::vector<float>> points, std::vector<int> &cluster,
+					)
+{
+	processed[indice] = true; 
+	cluster.push_back(indice);
+
+	std::vector<int> nearest = tree->search(points[indice], distanceTol); 
+
+	for (int id : nearest){
+		if (!processed[id]){
+			clusterHelper(id, points, cluster, processed, tree, distanceTol);
+		}
+	}
+}
+					
+
+
+
+
+
+
 	return clusters;
 
 }
