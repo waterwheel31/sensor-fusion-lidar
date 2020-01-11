@@ -51,30 +51,41 @@ class KdTree
             
         }
 
-        /*
-        void searchHelper(std::vector<float> target, Node* node, int depth, float distanceTol, std::vector<int> &ids){
-            if(notde!=NULL){
-                if ((node->point[0]>=(target[0] - distanceTol) && node ->point[0]<=(target[0] + distanceTol)) && (node->point[1]>=(target[1] -distanceTol)))
-                    float distance = sqrt((node->point[0]-target[0])*(node->point[0]-target[0]) + (node->point[1]-target[1])*(node->point[1]-target[1]));
-                    if (distance <= distanceTol){
-                        ids.push_back(node->id);
+        
+        void searchHelper(pcl::PointXYZI target, Node* node, int depth, float tol, std::vector<int> &nearest){
+            
+            if(node != NULL){
+                if ( node->point.x >= (target.x - tol) && node->point.x <= (target.x + tol) &&
+                     node->point.y >= (target.y - tol) && node->point.y <= (target.y + tol) &&
+                     node->point.z >= (target.z - tol) && node->point.z <= (target.z + tol))
+                    {
+                        float distance = sqrt((node->point.x - target.x)*(node->point.x - target.x) + 
+                                              (node->point.y - target.y)*(node->point.y - target.y) + 
+                                              (node->point.z - target.z)*(node->point.z - target.z));
+                                            
+                        if (distance <= tol){
+                            nearest.push_back(node->id);
+                        }
                     }
 
-                if((target[depth%2] - distanceTol) < node->point[depth%2]){
-                    searchHelper(target, node->left, depth+1, distanceTol, ids); 
+                std::vector<float> targetPoint = {target.x, target.y, target.z}; 
+                std::vector<float> nodePoint = {node->point.x, node->point.y, node->point.z}; 
+
+                if((targetPoint[depth%3] - tol) < nodePoint[depth%3]){
+                    searchHelper(target, node->left, depth+1, tol, nearest); 
                 } else {
-                    searchHelper(target, node->right, depth+1, distanceTol, ids); 
+                    searchHelper(target, node->right, depth+1, tol, nearest); 
                 }
 
             }
         }
-        */
+        
         
         
         // return a list of point ids in the tree that are within distance of target
-        void radiusSearch(const PointT &point, double clusterTolerance, std::vector<int> &nearest, std::vector<float> &distances )
+        void radiusSearch(pcl::PointXYZI target, double clusterTolerance, std::vector<int> &nearest, std::vector<float> &distances )
         {
-            std::vector<int> ids;  
+            searchHelper(target, root, 0, clusterTolerance, nearest);
         }
         
         
