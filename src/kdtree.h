@@ -3,15 +3,16 @@
 #include <vector>
 
 // Structure to represent node of kd tree
+
 struct Node
 {
-	std::vector<float> point;
+	pcl::PointXYZI point;   
 	int id;
 	Node* left;
 	Node* right;
 
-	Node(std::vector<float> arr, int setId)
-	:	point(arr), id(setId), left(NULL), right(NULL)
+	Node(pcl::PointXYZI pnt, int setId)
+	:	point(pnt), id(setId), left(NULL), right(NULL)
 	{}
 };
 
@@ -20,17 +21,20 @@ class KdTree
 {
 	
     public: 
-        Node* root;
+        Node *root;
 
         KdTree()
         : root(NULL)
         {}
 
-        void insertHelper(Node** node, uint depth, std::vector<float> point, int id){
+        void insertHelper(Node **node, uint depth, pcl::PointXYZI point, int id){
             if (*node==NULL) { *node = new Node(point, id);}
             else{
-                uint cd = depth % 2;
-                if (point[cd] < ((*node)->point[cd])){ 
+                std::vector<float> newPoint = {point.x, point.y, point.z}; 
+                std::vector<float> nodePoint = {(*node)->point.x, (*node)->point.y, (*node)->point.z}; 
+
+                uint cd = depth % 3;
+                if (newPoint[cd] < nodePoint[cd]){ 
                     insertHelper(&((*node)->left), depth+1, point, id);
                 }
                 else {
@@ -41,7 +45,10 @@ class KdTree
 
         void setInputCloud(typename pcl::PointCloud<PointT>::Ptr cloud)
         {
-            insertHelper(&root, 0, point, id);
+            for (std::size_t i = 0; i < cloud->points.size (); ++i){
+                insertHelper(&root, 0, cloud->points[i], 0);
+            }
+            
         }
 
         /*
@@ -61,7 +68,7 @@ class KdTree
 
             }
         }
-        
+        */
         
         
         // return a list of point ids in the tree that are within distance of target
@@ -69,7 +76,7 @@ class KdTree
         {
             std::vector<int> ids;  
         }
-        */
+        
         
 
 };

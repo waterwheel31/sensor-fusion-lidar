@@ -314,10 +314,9 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
 
     std::vector<typename pcl::PointCloud<PointT>::Ptr> clusters;
 
-    
     //typename pcl::search::KdTree<PointT>::Ptr tree(new pcl::search::KdTree<PointT>);
     
-    KdTree<PointT> tree;
+    std::shared_ptr<KdTree<PointT>> tree;
     tree->setInputCloud(cloud);
     
 
@@ -335,7 +334,7 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
         }
 
         pcl::PointIndices indices_tmp;
-        clusterHelper(i, cloud, indices_tmp, processed, tree, clusterTolerance);
+        clusterHelper_newKDTree(i, cloud, indices_tmp, processed, tree, clusterTolerance);
         clusterIndices.push_back(indices_tmp);
         i++;
     }
@@ -368,7 +367,7 @@ void ProcessPointClouds<PointT>::clusterHelper_newKDTree( int indice,
                                                 typename pcl::PointCloud<PointT>::Ptr cloud,  
                                                 pcl::PointIndices &indices_tmp,
                                                 std::vector<bool> &processed, 
-                                                typename pcl::search::KdTree<PointT>::Ptr tree,
+                                                std::shared_ptr<KdTree<PointT>> tree,
                                                 float clusterTolerance)
 {
     processed[indice] = true; 
@@ -380,7 +379,7 @@ void ProcessPointClouds<PointT>::clusterHelper_newKDTree( int indice,
 
     for (int id : nearest){
         if (!processed[id]){
-            clusterHelper(id, cloud, indices_tmp, processed, tree, clusterTolerance); 
+            clusterHelper_newKDTree(id, cloud, indices_tmp, processed, tree, clusterTolerance); 
         }
     }
 }
