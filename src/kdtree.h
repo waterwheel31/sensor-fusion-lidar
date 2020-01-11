@@ -28,8 +28,12 @@ class KdTree
         {}
 
         void insertHelper(Node **node, uint depth, pcl::PointXYZI point, int id){
-            if (*node==NULL) { *node = new Node(point, id);}
+            if (*node==NULL) { 
+                std::cout << "node==NULL" << std::endl;
+                *node = new Node(point, id);
+            }
             else{
+                std::cout << "insertHelper checkpoint 1" << std::endl;
                 std::vector<float> newPoint = {point.x, point.y, point.z}; 
                 std::vector<float> nodePoint = {(*node)->point.x, (*node)->point.y, (*node)->point.z}; 
 
@@ -45,8 +49,10 @@ class KdTree
 
         void setInputCloud(typename pcl::PointCloud<PointT>::Ptr cloud)
         {
-            for (std::size_t i = 0; i < cloud->points.size (); ++i){
-                insertHelper(&root, 0, cloud->points[i], 0);
+            //std::cout << "cloud->points.size (): " << cloud->points.size () << std::endl;
+            for (int i = 0; i < cloud->points.size(); ++i){
+                std::cout << "setInputCloud i:" << i << std::endl;
+                insertHelper(&root, 0, cloud->points[i], i);
             }
             
         }
@@ -79,8 +85,6 @@ class KdTree
 
             }
         }
-        
-        
         
         // return a list of point ids in the tree that are within distance of target
         void radiusSearch(pcl::PointXYZI target, double clusterTolerance, std::vector<int> &nearest, std::vector<float> &distances )
