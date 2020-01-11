@@ -229,7 +229,7 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
     return clusters;
 }
 
-// alternative function without using existing KDTree function in PCL library. 
+// alternative function without using existing Euclidean function in PCL library. 
 template<typename PointT>
 std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::Clustering_Scratch(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize)
 {
@@ -258,8 +258,6 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
         clusterIndices.push_back(indices_tmp);
         i++;
     }
-
-
 
     for(pcl::PointIndices getIndices: clusterIndices){
         typename pcl::PointCloud<PointT>::Ptr cloudCluster (new pcl::PointCloud<PointT>);
@@ -304,6 +302,89 @@ void ProcessPointClouds<PointT>::clusterHelper( int indice,
         }
     }
 }
+
+
+// alternative function without using existing Euclidean function and KD Tree in PCL library. 
+template<typename PointT>
+std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::Clustering_Scratch_newKDTree(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize)
+{
+
+    // Time clustering process
+    auto startTime = std::chrono::steady_clock::now();
+
+    std::vector<typename pcl::PointCloud<PointT>::Ptr> clusters;
+
+    
+    //typename pcl::search::KdTree<PointT>::Ptr tree(new pcl::search::KdTree<PointT>);
+    
+    KdTree<PointT> tree;
+    tree->setInputCloud(cloud);
+    
+
+
+
+    std::vector<pcl::PointIndices> clusterIndices; 
+
+    std::vector<bool> processed(cloud->points.size(), false);
+
+    int i = 0;
+    while(i < cloud->points.size()){
+        if (processed[i]){
+            i++;
+            continue; 
+        }
+
+        pcl::PointIndices indices_tmp;
+        clusterHelper(i, cloud, indices_tmp, processed, tree, clusterTolerance);
+        clusterIndices.push_back(indices_tmp);
+        i++;
+    }
+
+    for(pcl::PointIndices getIndices: clusterIndices){
+        typename pcl::PointCloud<PointT>::Ptr cloudCluster (new pcl::PointCloud<PointT>);
+
+        for(int index: getIndices.indices){
+            cloudCluster->points.push_back(cloud->points[index]);
+        }
+
+        cloudCluster->width = cloudCluster->points.size();
+        cloudCluster->height = 1; 
+        cloudCluster->is_dense = true; 
+
+        clusters.push_back(cloudCluster);
+    }
+
+
+    auto endTime = std::chrono::steady_clock::now();
+    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+    std::cout << "clustering took " << elapsedTime.count() << " milliseconds and found " << clusters.size() << " clusters" << std::endl;
+
+    return clusters;
+}
+
+// alternative function without using existing Euclidean function and KD Tree in PCL library. 
+template<typename PointT>
+void ProcessPointClouds<PointT>::clusterHelper_newKDTree( int indice, 
+                                                typename pcl::PointCloud<PointT>::Ptr cloud,  
+                                                pcl::PointIndices &indices_tmp,
+                                                std::vector<bool> &processed, 
+                                                typename pcl::search::KdTree<PointT>::Ptr tree,
+                                                float clusterTolerance)
+{
+    processed[indice] = true; 
+    indices_tmp.indices.push_back(indice); 
+
+    std::vector<int> nearest;
+    std::vector<float> distances;
+    tree->radiusSearch(cloud->points[indice], clusterTolerance, nearest, distances);
+
+    for (int id : nearest){
+        if (!processed[id]){
+            clusterHelper(id, cloud, indices_tmp, processed, tree, clusterTolerance); 
+        }
+    }
+}
+
 
 
 template<typename PointT>

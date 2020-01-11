@@ -18,6 +18,7 @@
 #include <ctime>
 #include <chrono>
 #include "render/box.h"
+#include "kdtree.h"
 
 template<typename PointT>
 class ProcessPointClouds {
@@ -40,6 +41,9 @@ public:
     std::vector<typename pcl::PointCloud<PointT>::Ptr> Clustering(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize);
     std::vector<typename pcl::PointCloud<PointT>::Ptr> Clustering_Scratch(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize);
     void clusterHelper( int indice, typename pcl::PointCloud<PointT>::Ptr cloud,  pcl::PointIndices &indices_tmp, std::vector<bool> &procecced, typename pcl::search::KdTree<PointT>::Ptr tree, float clusterTolerance);
+
+    std::vector<typename pcl::PointCloud<PointT>::Ptr> Clustering_Scratch_newKDTree(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize);
+    void clusterHelper_newKDTree( int indice, typename pcl::PointCloud<PointT>::Ptr cloud,  pcl::PointIndices &indices_tmp, std::vector<bool> &procecced, typename pcl::search::KdTree<PointT>::Ptr tree, float clusterTolerance);
 
 
 
