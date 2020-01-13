@@ -137,6 +137,7 @@ void cityBlock_stream(pcl::visualization::PCLVisualizer::Ptr& viewer,
     std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = pointProcessorI->SegmentPlane_Scratch(filterCloud, 1000, 0.4);
     renderPointCloud(viewer,segmentCloud.second,"planeCloud",Color(0,1,0));
 
+    //std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessorI->Clustering_Scratch_newKDTree(segmentCloud.first, 1, 10, 500);
     std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessorI->Clustering_Scratch_newKDTree(segmentCloud.first, 1, 10, 500);
 
     int clusterId = 0;

@@ -33,7 +33,7 @@ class KdTree
                 *node = new Node(point, id);
             }
             else{
-                std::cout << "insertHelper checkpoint 1" << std::endl;
+                // std::cout << "insertHelper checkpoint 1" << std::endl;
                 std::vector<float> newPoint = {point.x, point.y, point.z}; 
                 std::vector<float> nodePoint = {(*node)->point.x, (*node)->point.y, (*node)->point.z}; 
 
@@ -50,20 +50,23 @@ class KdTree
         void setInputCloud(typename pcl::PointCloud<PointT>::Ptr cloud)
         {
             //std::cout << "cloud->points.size (): " << cloud->points.size () << std::endl;
-            for (int i = 0; i < cloud->points.size(); ++i){
+            for (int i = 0; i < cloud->points.size(); i++){
                 std::cout << "setInputCloud i:" << i << std::endl;
-                insertHelper(&root, 0, cloud->points[i], i);
-            }
-            
+                    insertHelper(&root, 0, cloud->points[i], i);
+                }  
         }
 
         
         void searchHelper(pcl::PointXYZI target, Node* node, int depth, float tol, std::vector<int> &nearest){
             
             if(node != NULL){
-                if ( node->point.x >= (target.x - tol) && node->point.x <= (target.x + tol) &&
-                     node->point.y >= (target.y - tol) && node->point.y <= (target.y + tol) &&
-                     node->point.z >= (target.z - tol) && node->point.z <= (target.z + tol))
+                // std::cout << node->point.x  << ":" << target.x << std::endl; 
+                if ( node->point.x >= (target.x - tol) && 
+                     node->point.x <= (target.x + tol) &&
+                     node->point.y >= (target.y - tol) && 
+                     node->point.y <= (target.y + tol) &&
+                     node->point.z >= (target.z - tol) && 
+                     node->point.z <= (target.z + tol))
                     {
                         float distance = sqrt((node->point.x - target.x)*(node->point.x - target.x) + 
                                               (node->point.y - target.y)*(node->point.y - target.y) + 
@@ -71,6 +74,9 @@ class KdTree
                                             
                         if (distance <= tol){
                             nearest.push_back(node->id);
+                            std:: cout << "inside the distance" << std::endl; 
+                        } else {
+                            std::cout  << "distance too large" << std:: endl; 
                         }
                     }
 
@@ -83,6 +89,8 @@ class KdTree
                     searchHelper(target, node->right, depth+1, tol, nearest); 
                 }
 
+            } else {
+               // std::cout << "node is null" << std::endl; 
             }
         }
         

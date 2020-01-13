@@ -43,7 +43,8 @@ public:
     void clusterHelper( int indice, typename pcl::PointCloud<PointT>::Ptr cloud,  pcl::PointIndices &indices_tmp, std::vector<bool> &procecced, typename pcl::search::KdTree<PointT>::Ptr tree, float clusterTolerance);
 
     std::vector<typename pcl::PointCloud<PointT>::Ptr> Clustering_Scratch_newKDTree(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize);
-    void clusterHelper_newKDTree( int indice, typename pcl::PointCloud<PointT>::Ptr cloud,  pcl::PointIndices &indices_tmp, std::vector<bool> &procecced,  std::shared_ptr<KdTree<PointT>> tree, float clusterTolerance);
+    //void clusterHelper_newKDTree( int indice, typename pcl::PointCloud<PointT>::Ptr cloud,  pcl::PointIndices &indices_tmp, std::vector<bool> &procecced,  std::shared_ptr<KdTree<PointT>> tree, float clusterTolerance);
+    void clusterHelper_newKDTree( int indice, typename pcl::PointCloud<PointT>::Ptr cloud,  pcl::PointIndices &indices_tmp, std::vector<bool> &procecced,  KdTree<PointT> *tree, float clusterTolerance);
 
 
 
