@@ -254,8 +254,16 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
         }
 
         pcl::PointIndices indices_tmp;
+
         clusterHelper(i, cloud, indices_tmp, processed, tree, clusterTolerance);
-        clusterIndices.push_back(indices_tmp);
+        if (indices_tmp.indices.size() >= minSize && indices_tmp.indices.size() <= maxSize){
+            clusterIndices.push_back(indices_tmp);
+        } else {
+            for (int remove_index: indices_tmp.indices){
+                processed[remove_index] = false;
+                std::cout << "cluster size is not valid:" << indices_tmp.indices.size() << " min and max size: "<<  minSize << " : " <<  maxSize << std::endl;  
+            }
+        }
         i++;
     }
 
@@ -332,13 +340,14 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
         }
 
         pcl::PointIndices indices_tmp;
+
         clusterHelper_newKDTree(i, cloud, indices_tmp, processed, tree, clusterTolerance);
-        if (indices_tmp.indices.size() >= minSize && indices_tmp.indices.size() <=maxSize){
+        if (indices_tmp.indices.size() >= minSize && indices_tmp.indices.size() <= maxSize){
             clusterIndices.push_back(indices_tmp);
         } else {
             for (int remove_index: indices_tmp.indices){
                 processed[remove_index] = false;
-                std::cout << "cluster size is not valid:" << indices_tmp.indices.size() << std::endl;  
+                //std::cout << "cluster size is not valid:" << indices_tmp.indices.size() << " min and max size: "<<  minSize << " : " <<  maxSize << std::endl;  
             }
         }
         i++;
@@ -382,6 +391,8 @@ void ProcessPointClouds<PointT>::clusterHelper_newKDTree( int indice,
     std::vector<int> nearest;
     std::vector<float> distances;
     tree->radiusSearch(cloud->points[indice], clusterTolerance, nearest, distances);
+
+    //std::cout <<"indice: " << indice <<  " nearest.size: " << nearest.size() << std::endl;
 
     for (int id : nearest){
         if (!processed[id]){

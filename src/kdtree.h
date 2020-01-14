@@ -29,7 +29,7 @@ class KdTree
 
         void insertHelper(Node **node, uint depth, pcl::PointXYZI point, int id){
             if (*node==NULL) { 
-                std::cout << "node==NULL" << std::endl;
+                //std::cout << "node==NULL" << std::endl;
                 *node = new Node(point, id);
             }
             else{
@@ -51,7 +51,7 @@ class KdTree
         {
             //std::cout << "cloud->points.size (): " << cloud->points.size () << std::endl;
             for (int i = 0; i < cloud->points.size(); i++){
-                std::cout << "setInputCloud i:" << i << std::endl;
+                //std::cout << "setInputCloud i:" << i << std::endl;
                     insertHelper(&root, 0, cloud->points[i], i);
                 }  
         }
@@ -74,20 +74,54 @@ class KdTree
                                             
                         if (distance <= tol){
                             nearest.push_back(node->id);
-                            std:: cout << "inside the distance" << std::endl; 
+                            //std:: cout << "inside the distance" << std::endl; 
                         } else {
-                            std::cout  << "distance too large" << std:: endl; 
+                            //std::cout  << "distance too large" << std:: endl; 
                         }
                     }
+                else {
+                    // std::cout << "node and target are so far each other" << " depth:" << depth << std::endl;
+                }
 
                 std::vector<float> targetPoint = {target.x, target.y, target.z}; 
                 std::vector<float> nodePoint = {node->point.x, node->point.y, node->point.z}; 
 
+                /*
                 if((targetPoint[depth%3] - tol) < nodePoint[depth%3]){
                     searchHelper(target, node->left, depth+1, tol, nearest); 
                 } else {
                     searchHelper(target, node->right, depth+1, tol, nearest); 
+                }*/
+
+                ///if((targetPoint[depth%3] - tol) < nodePoint[depth%3]){searchHelper(target, node->left, depth+1, tol, nearest); } 
+                //if((targetPoint[depth%3] - tol) >= nodePoint[depth%3]){searchHelper(target, node->right, depth+1, tol, nearest); } 
+                
+                if(depth%3 == 0){
+                    if ((target.x - tol) < node->point.x) { 
+                        //std::cout << "depth 0-a" << std::endl;
+                        searchHelper(target, node->left, depth+1, tol, nearest);
+                       
+                        }
+                    if ((target.x + tol) > node->point.x) { 
+                        //std::cout << "depth 0-b" << std::endl; 
+                        searchHelper(target, node->right, depth+1, tol, nearest);
+                        
+                        }
+                    
                 }
+                if(depth%3 == 1){
+                    //std::cout << "depth 1" << std::endl; 
+                    if ((target.y - tol) < node->point.y) { searchHelper(target, node->left, depth+1, tol, nearest); }
+                    if ((target.y + tol) > node->point.y) { searchHelper(target, node->right, depth+1, tol, nearest); }
+                    
+                }
+                if(depth%3 == 2){
+                    //std::cout << "depth 2" << std::endl; 
+                    if ((target.z - tol) < node->point.z) { searchHelper(target, node->left, depth+1, tol, nearest); }
+                    if ((target.z + tol) > node->point.z) { searchHelper(target, node->right, depth+1, tol, nearest); }
+                    
+                }
+
 
             } else {
                // std::cout << "node is null" << std::endl; 
